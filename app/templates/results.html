@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Segmentation Results</title>
+</head>
+<body>
+    <h1>{{ chosen_type }} Segmentation Results</h1>
+    <p>Number of clusters: {{ cluster_info.n_clusters }}</p>
+    <p>Silhouette score: {{ cluster_info.silhouette_score }}</p>
+
+    <h2>Insights</h2>
+    <ul>
+    {% for insight in insights %}
+        <li>
+            <strong>Cluster {{ insight.cluster_id }}:</strong> {{ insight.description }}
+            <br>
+            Recommendation: {{ insight.recommendation }}
+        </li>
+    {% endfor %}
+    </ul>
+</body>
+</html>
