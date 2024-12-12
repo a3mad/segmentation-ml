@@ -54,21 +54,23 @@ REQUIRED_COLUMNS_MAP = {
     }
 }
 
-def load_and_prepare_data(segmentation_type, df, column_mapping):
-    """
-    Load, preprocess, and prepare the data for clustering.
-    """
+def load_and_prepare_data(segmentation_type, df, column_mapping, session):
+
     required_cols = list(REQUIRED_COLUMNS_MAP[segmentation_type]['columns'].keys())
-    mapped_columns = {req: column_mapping.get(req) for req in required_cols}  # Map user-selected columns
+    mapped_columns = {req: column_mapping.get(req) for req in required_cols}
 
-    # Select only columns that are not "None"
-    df_selected = df[[mapped_columns[req] for req in required_cols if mapped_columns[req] is not None]].copy()
+    # Include additional columns selected by the user
+    additional_columns = session.get('additional_columns', [])
+    all_columns = [mapped_columns[req] for req in required_cols if mapped_columns[req] is not None] + additional_columns
 
-    # Encode categorical variables
-    for req_col, info in REQUIRED_COLUMNS_MAP[segmentation_type]['columns'].items():
-        if info['type'] == 'str' and mapped_columns[req_col] in df_selected:
+    # Select and preprocess the dataset
+    df_selected = df[all_columns].copy()
+
+    # Handle string/categorical columns
+    for col in df_selected.columns:
+        if df_selected[col].dtype == 'object':
             le = LabelEncoder()
-            df_selected[mapped_columns[req_col]] = le.fit_transform(df_selected[mapped_columns[req_col]].astype(str))
+            df_selected[col] = le.fit_transform(df_selected[col].astype(str))
 
     # Scale numerical columns
     scaler = StandardScaler()
@@ -77,6 +79,9 @@ def load_and_prepare_data(segmentation_type, df, column_mapping):
     # Reset index for alignment
     df_selected = df_selected.reset_index(drop=True)
     return scaled_data, df_selected
+
+
+
 
 
 

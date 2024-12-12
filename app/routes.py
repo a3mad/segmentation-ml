@@ -49,11 +49,11 @@ def step3_match_columns():
         return redirect(url_for('main.step1_select_type'))
 
     chosen_type = session['chosen_type']
-    required_cols = list(REQUIRED_COLUMNS_MAP[chosen_type]['columns'].keys())  # Retrieve required columns
+    required_cols = list(REQUIRED_COLUMNS_MAP[chosen_type]['columns'].keys())
 
     try:
         df = pd.read_csv(session['uploaded_file'])
-        if current_app.config.get('DEBUG_MODE', False):  # Limit rows in debug mode
+        if current_app.config.get('DEBUG_MODE', False):
             df = df.head(100)
     except Exception as e:
         return f"Error loading dataset: {str(e)}"
@@ -62,13 +62,19 @@ def step3_match_columns():
 
     # Autoload matched columns
     matched = {req: next((col for col in dataset_columns if col.lower() == req.lower()), None) for req in required_cols}
+    additional_columns = []
 
     if request.method == 'POST':
-        # Allow users to choose "None" for any column
+        # Handle default column mapping
         for req_col in required_cols:
             chosen_col = request.form.get(req_col)
             matched[req_col] = chosen_col if chosen_col != 'None' else None
 
+        # Handle additional columns selected by the user
+        additional_columns = request.form.getlist('additional_columns')
+        session['additional_columns'] = additional_columns
+
+        # Store column mapping and redirect to confirmation step
         session['column_mapping'] = matched
         return redirect(url_for('main.step3_confirm_columns'))
 
@@ -77,8 +83,10 @@ def step3_match_columns():
         required_cols=required_cols,
         dataset_columns=dataset_columns,
         matched=matched,
-        segmentation_info=REQUIRED_COLUMNS_MAP[chosen_type]
+        segmentation_info=REQUIRED_COLUMNS_MAP[chosen_type],
+        additional_columns=additional_columns
     )
+
 
 
 @main.route('/step3_confirm_columns', methods=['GET', 'POST'])
@@ -87,11 +95,17 @@ def step3_confirm_columns():
         return redirect(url_for('main.step1_select_type'))
 
     column_mapping = session['column_mapping']
+    additional_columns = session.get('additional_columns', [])
 
     if request.method == 'POST':
-        return redirect(url_for('main.step4_results'))  # Proceed to the results step
+        return redirect(url_for('main.step4_results'))
 
-    return render_template('step3_confirm_columns.html', column_mapping=column_mapping)
+    return render_template(
+        'step3_confirm_columns.html',
+        column_mapping=column_mapping,
+        additional_columns=additional_columns
+    )
+
 
 
 @main.route('/step4_results', methods=['GET'])
@@ -104,11 +118,14 @@ def step4_results():
     upload_path = session['uploaded_file']
 
     try:
-        # Load and preprocess the data
+        # Load the dataset
         df = pd.read_csv(upload_path)
         if current_app.config.get('DEBUG_MODE', False):
             df = df.head(100)
-        df_scaled, df_original = load_and_prepare_data(chosen_type, df, column_mapping)
+
+        # Pass session explicitly to the function
+        df_scaled, df_original = load_and_prepare_data(chosen_type, df, column_mapping, session)
+
     except ValueError as e:
         return f"Error during data preparation: {str(e)}"
     except Exception as e:
@@ -120,6 +137,7 @@ def step4_results():
 
         # Generate insights
         insights = generate_insights(df_original, cluster_labels)
+
     except Exception as e:
         return f"Error during clustering or insights generation: {str(e)}"
 

@@ -19,6 +19,14 @@
         </tr>
         {% endfor %}
     </table>
+
+    <h3>Additional Columns</h3>
+    <ul>
+        {% for col in additional_columns %}
+        <li>{{ col }}</li>
+        {% endfor %}
+    </ul>
+
     <p>Segmentation might take some time. Are you sure you want to proceed?</p>
     <form method="POST">
         <button type="submit">Confirm and Proceed</button>

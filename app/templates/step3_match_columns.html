@@ -20,7 +20,7 @@
                 <td>{{ req_col }}</td>
                 <td>
                     <select name="{{ req_col }}">
-                        <option value="None">None</option> <!-- Allow None -->
+                        <option value="None">None</option>
                         {% for col in dataset_columns %}
                         <option value="{{ col }}" {% if matched[req_col] == col %}selected{% endif %}>{{ col }}</option>
                         {% endfor %}
@@ -37,6 +37,17 @@
             </tr>
             {% endfor %}
         </table>
+
+        <h3>Add Additional Columns</h3>
+        <p>Select additional columns from your dataset to include in the segmentation process:</p>
+        {% for col in dataset_columns %}
+        <div>
+            <input type="checkbox" name="additional_columns" value="{{ col }}"
+                   {% if col in additional_columns %}checked{% endif %}>
+            <label for="{{ col }}">{{ col }}</label>
+        </div>
+        {% endfor %}
+
         <button type="submit">Next</button>
     </form>
 </body>
