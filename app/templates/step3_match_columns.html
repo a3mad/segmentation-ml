@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Step 3: Match Columns</title>
+</head>
+<body>
+    <h1>Step 3: Match Columns</h1>
+    <p>Please match the required columns with your dataset columns. You can choose "None" if a column is not applicable.</p>
+    <form method="POST">
+        <table>
+            <tr>
+                <th>Required Column</th>
+                <th>Dataset Column</th>
+            </tr>
+            {% for req_col in required_cols %}
+            <tr>
+                <td>{{ req_col }}</td>
+                <td>
+                    <select name="{{ req_col }}">
+                        <option value="None">None</option>
+                        {% for col in dataset_columns %}
+                            <option value="{{ col }}" {% if matched[req_col] == col %}selected{% endif %}>{{ col }}</option>
+                        {% endfor %}
+                    </select>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+        <button type="submit">Next</button>
+    </form>
+</body>
+</html>

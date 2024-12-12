@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Step 3 Confirmation</title>
+</head>
+<body>
+    <h1>Step 3: Confirm Matched Columns</h1>
+    <p>The following column mapping will be used for segmentation:</p>
+    <table>
+        <tr>
+            <th>Required Column</th>
+            <th>Dataset Column</th>
+        </tr>
+        {% for req_col, dataset_col in column_mapping.items() %}
+        <tr>
+            <td>{{ req_col }}</td>
+            <td>{{ dataset_col if dataset_col else "None" }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <p>Segmentation might take some time. Are you sure you want to proceed?</p>
+    <form method="POST">
+        <button type="submit">Confirm and Proceed</button>
+    </form>
+    <form method="GET" action="{{ url_for('main.step3_match_columns') }}">
+        <button type="submit">Go Back</button>
+    </form>
+</body>
+</html>

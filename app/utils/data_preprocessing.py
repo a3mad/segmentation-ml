@@ -1,27 +1,41 @@
 import pandas as pd
 from sklearn.preprocessing import LabelEncoder, StandardScaler
 
+# Define the required columns for each segmentation type
+REQUIRED_COLUMNS_MAP = {
+    'Demographic': ["Age", "Gender", "Income Level", "Education Level", "Occupation", "Marital Status",
+                    "Insurance Products Owned"],
+    'Geographic': ["Country", "City", "Region"],
+    'Behavioral': ["Purchase Frequency", "Average Spend", "Loyalty Score"],
+    'Psychographic': ["Lifestyle", "Interests", "Values"],
+    'ProductUsage': ["Product Category", "Usage Frequency", "Last Purchase Days Ago"]
+}
 
-def load_and_prepare_data(segmentation_type):
-    # Load the dataset
-    df = pd.read_csv('data/customer_segmentation_data.csv')
 
-    if segmentation_type == 'Demographic':
-        selected_columns = ["Age", "Gender", "Income Level", "Education Level", "Occupation", "Marital Status",
-                            "Insurance Products Owned"]
-    elif segmentation_type == 'Geographic':
+def load_and_prepare_data(segmentation_type, df, column_mapping):
+    # Apply column mapping
+    rename_map = {v: k for k, v in column_mapping.items() if v is not None}
+    df = df.rename(columns=rename_map)
 
-        selected_columns = ["Country", "City", "Region"]
-    else:
+    # Ensure required columns are present
+    required_cols = REQUIRED_COLUMNS_MAP[segmentation_type]
+    missing_cols = [col for col in required_cols if col not in df.columns]
+    if missing_cols:
+        raise ValueError(f"Missing required columns: {missing_cols}")
 
-        selected_columns = ["Age", "Gender", "Income Level"]
+    # Select and preprocess the required columns
+    df_selected = df[required_cols].copy()
 
-    df_selected = df[selected_columns].copy()
-
+    # Encode categorical variables
     for col in df_selected.select_dtypes(include=['object']).columns:
-        df_selected[col] = LabelEncoder().fit_transform(df_selected[col].astype(str))
+        le = LabelEncoder()
+        df_selected[col] = le.fit_transform(df_selected[col].astype(str))
 
+    # Scale numerical features
     scaler = StandardScaler()
-    df_scaled = scaler.fit_transform(df_selected)
+    scaled_data = scaler.fit_transform(df_selected)
 
-    return df_scaled
+    # Reset index for alignment
+    df_selected.reset_index(drop=True, inplace=True)
+    return scaled_data, df_selected
+
