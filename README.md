@@ -15,9 +15,10 @@ Before running the project, ensure you have the following installed on your syst
 1. **Clone the Repository**  
    Clone the project repository to your local machine:
 
-   `git clone https://github.com/a3mad/segmentation-ml.git`
-
-
+   ```bash
+   git clone https://github.com/a3mad/segmentation-ml.git
+   ```
+   
 2. **Create and Activate a Virtual Environment**  
    Create and activate a virtual environment to isolate project dependencies.
 
@@ -34,9 +35,10 @@ Before running the project, ensure you have the following installed on your syst
 
 3. **Install Dependencies**  
    Install the required Python libraries from the `requirements.txt` file:
-   `pip install -r requirements.txt`
-
-
+   ```bash
+   pip install -r requirements.txt
+   ```
+   
 4. **Set Flask Environment Variables**  
    Set the necessary environment variables to run the Flask app.
 
@@ -53,7 +55,9 @@ Before running the project, ensure you have the following installed on your syst
 
 5. **Run the Application**  
    Start the Flask development server:
-   `flask run`
+   ```bash
+   flask run
+   ```
 
 
 6. **Interact with the Application**  
@@ -71,7 +75,10 @@ Before running the project, ensure you have the following installed on your syst
    - Set `DEBUG_MODE = True`.
 
 8. **Deactivate the Virtual Environment**  
-   When you're done, deactivate the virtual environment:`deactivate`
+   When you're done, deactivate the virtual environment: 
+   ```bash
+   deactivate
+   ```
 
 ### Troubleshooting
 - **Dependencies Not Installing:** Ensure you are using the correct version of Python and pip.
