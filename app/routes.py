@@ -49,7 +49,7 @@ def step3_match_columns():
         return redirect(url_for('main.step1_select_type'))
 
     chosen_type = session['chosen_type']
-    required_cols = session['required_columns']
+    required_cols = list(REQUIRED_COLUMNS_MAP[chosen_type]['columns'].keys())  # Retrieve required columns
 
     try:
         df = pd.read_csv(session['uploaded_file'])
@@ -58,22 +58,27 @@ def step3_match_columns():
     except Exception as e:
         return f"Error loading dataset: {str(e)}"
 
-    dataset_columns = df.columns.tolist()  # Get column names from the dataset
+    dataset_columns = df.columns.tolist()
 
     # Autoload matched columns
     matched = {req: next((col for col in dataset_columns if col.lower() == req.lower()), None) for req in required_cols}
 
     if request.method == 'POST':
-        # Store user selections for column mapping
+        # Allow users to choose "None" for any column
         for req_col in required_cols:
             chosen_col = request.form.get(req_col)
             matched[req_col] = chosen_col if chosen_col != 'None' else None
 
         session['column_mapping'] = matched
-        return redirect(url_for('main.step3_confirm_columns'))  # Redirect to confirmation step
+        return redirect(url_for('main.step3_confirm_columns'))
 
-    return render_template('step3_match_columns.html', required_cols=required_cols, dataset_columns=dataset_columns,
-                           matched=matched)
+    return render_template(
+        'step3_match_columns.html',
+        required_cols=required_cols,
+        dataset_columns=dataset_columns,
+        matched=matched,
+        segmentation_info=REQUIRED_COLUMNS_MAP[chosen_type]
+    )
 
 
 @main.route('/step3_confirm_columns', methods=['GET', 'POST'])

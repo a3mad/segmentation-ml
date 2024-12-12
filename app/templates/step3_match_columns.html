@@ -6,23 +6,33 @@
 </head>
 <body>
     <h1>Step 3: Match Columns</h1>
-    <p>Please match the required columns with your dataset columns. You can choose "None" if a column is not applicable.</p>
+    <p>Please match the required columns with your dataset. You can choose "None" if the column is not applicable.</p>
     <form method="POST">
         <table>
             <tr>
                 <th>Required Column</th>
                 <th>Dataset Column</th>
+                <th>Type</th>
+                <th>Range/Example</th>
             </tr>
-            {% for req_col in required_cols %}
+            {% for req_col, info in segmentation_info['columns'].items() %}
             <tr>
                 <td>{{ req_col }}</td>
                 <td>
                     <select name="{{ req_col }}">
-                        <option value="None">None</option>
+                        <option value="None">None</option> <!-- Allow None -->
                         {% for col in dataset_columns %}
-                            <option value="{{ col }}" {% if matched[req_col] == col %}selected{% endif %}>{{ col }}</option>
+                        <option value="{{ col }}" {% if matched[req_col] == col %}selected{% endif %}>{{ col }}</option>
                         {% endfor %}
                     </select>
+                </td>
+                <td>{{ info.type }}</td>
+                <td>
+                    {% if info.range %}
+                        {{ info.range }}
+                    {% else %}
+                        {{ info.example }}
+                    {% endif %}
                 </td>
             </tr>
             {% endfor %}
