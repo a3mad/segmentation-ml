@@ -31,6 +31,11 @@ def step1_select_type():
 def step2_upload_data():
     if 'chosen_type' not in session:
         return redirect(url_for('main.step1_select_type'))
+
+    # Retrieve the required columns info for the chosen segmentation type
+    chosen_type = session['chosen_type']
+    required_columns_info = REQUIRED_COLUMNS_MAP.get(chosen_type, {}).get('columns', {})
+
     if request.method == 'POST':
         if 'data_file' in request.files:
             file = request.files['data_file']
@@ -40,7 +45,9 @@ def step2_upload_data():
                 file.save(upload_path)
                 session['uploaded_file'] = upload_path
                 return redirect(url_for('main.step3_match_columns'))
-    return render_template('step2_upload_data.html')
+
+    # Pass required columns info to the template
+    return render_template('step2_upload_data.html', required_columns_info=required_columns_info)
 
 
 @main.route('/step3_match_columns', methods=['GET', 'POST'])
