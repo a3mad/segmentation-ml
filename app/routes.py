@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, request, session, redirect, url_fo
 from .utils.data_preprocessing import load_and_prepare_data, REQUIRED_COLUMNS_MAP
 from .utils.clustering import perform_clustering
 from .utils.cluster_labeling import generate_cluster_labels
-from .utils.insights import generate_insights
+from .utils.graph_utils import generate_graphs
 import pandas as pd
 import os
 import uuid
@@ -158,8 +158,11 @@ def step4_results():
         df_original['Cluster'] = cluster_labels
         df_original['Cluster Label'] = df_original['Cluster'].map(cluster_descriptions)
 
+        # Generate graphs using the new utility function
+        graph_save_path = os.path.join(current_app.root_path, 'static', 'images')
+        graph_files = generate_graphs(df_original, graph_save_path)
+
         # Prepare cluster info for the template
-        cluster_counts = df_original.groupby('Cluster').size().to_dict()
         cluster_info = {
             "n_clusters": cluster_info['n_clusters'],
             "silhouette_score": cluster_info['silhouette_score'],
@@ -167,7 +170,7 @@ def step4_results():
                 {
                     "id": cluster_id,
                     "label": cluster_descriptions[cluster_id],
-                    "count": cluster_counts.get(cluster_id, 0)
+                    "num_customers": len(df_original[df_original['Cluster'] == cluster_id])
                 }
                 for cluster_id in sorted(cluster_descriptions.keys())
             ],
@@ -175,11 +178,11 @@ def step4_results():
         }
 
     except Exception as e:
-        return f"Error during clustering or cluster description generation: {str(e)}"
+        return f"Error during clustering or insights generation: {str(e)}"
 
     return render_template(
         'step4_results.html',
         chosen_type=chosen_type,
-        cluster_info=cluster_info
+        cluster_info=cluster_info,
+        graph_files=graph_files
     )
-

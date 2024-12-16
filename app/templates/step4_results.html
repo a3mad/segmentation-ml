@@ -7,8 +7,8 @@
 <body>
     <h1>Step 4: Results</h1>
     <p>Segmentation Type: {{ chosen_type }}</p>
-    <p>Number of clusters: {{ cluster_info.n_clusters }}</p>
-    <p>Silhouette score: {{ cluster_info.silhouette_score }}</p>
+    <p>Number of Clusters: {{ cluster_info.n_clusters }}</p>
+    <p>Silhouette Score: {{ cluster_info.silhouette_score }}</p>
 
     <h2>Cluster Descriptions</h2>
     <table border="1">
@@ -24,10 +24,18 @@
             <tr>
                 <td>{{ cluster.id }}</td>
                 <td>{{ cluster.label }}</td>
-                <td>{{ cluster.count }}</td>
+                <td>{{ cluster.num_customers }}</td>
             </tr>
         {% endfor %}
         </tbody>
     </table>
+
+    <h2>Generated Graphs</h2>
+    {% for graph in graph_files %}
+        <div>
+            <h3>{{ graph.split('_')[0].replace('-', ' ').capitalize() }}</h3>
+            <img src="{{ url_for('static', filename='images/' + graph) }}" alt="{{ graph.split('_')[0].capitalize() }}">
+        </div>
+    {% endfor %}
 </body>
 </html>
