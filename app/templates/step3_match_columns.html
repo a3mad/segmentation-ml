@@ -1,54 +1,41 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8"/>
-    <title>Step 3: Match Columns</title>
-</head>
-<body>
-    <h1>Step 3: Match Columns</h1>
-    <p>Please match the required columns with your dataset. You can choose "None" if the column is not applicable.</p>
-    <form method="POST">
-        <table>
+{% extends "base.html" %}
+{% block title %}Match Dataset Columns{% endblock %}
+{% block content %}
+<h1 class="text-center">Step 3: Match Columns</h1>
+<form method="POST" class="mx-auto" style="max-width: 600px;">
+    <table class="table table-striped">
+        <thead>
             <tr>
                 <th>Required Column</th>
                 <th>Dataset Column</th>
-                <th>Type</th>
-                <th>Range/Example</th>
             </tr>
-            {% for req_col, info in segmentation_info['columns'].items() %}
+        </thead>
+        <tbody>
+            {% for req_col in required_cols %}
             <tr>
                 <td>{{ req_col }}</td>
                 <td>
-                    <select name="{{ req_col }}">
+                    <select name="{{ req_col }}" class="form-select">
                         <option value="None">None</option>
-                        {% for col in dataset_columns %}
-                        <option value="{{ col }}" {% if matched[req_col] == col %}selected{% endif %}>{{ col }}</option>
+                        {% for dataset_col in dataset_columns %}
+                        <option value="{{ dataset_col }}" {% if dataset_col == matched[req_col] %}selected{% endif %}>
+                            {{ dataset_col }}
+                        </option>
                         {% endfor %}
                     </select>
                 </td>
-                <td>{{ info.type }}</td>
-                <td>
-                    {% if info.range %}
-                        {{ info.range }}
-                    {% else %}
-                        {{ info.example }}
-                    {% endif %}
-                </td>
             </tr>
             {% endfor %}
-        </table>
-
-        <h3>Add Additional Columns</h3>
-        <p>Select additional columns from your dataset to include in the segmentation process:</p>
-        {% for col in dataset_columns %}
-        <div>
-            <input type="checkbox" name="additional_columns" value="{{ col }}"
-                   {% if col in additional_columns %}checked{% endif %}>
-            <label for="{{ col }}">{{ col }}</label>
-        </div>
-        {% endfor %}
-
-        <button type="submit">Next</button>
-    </form>
-</body>
-</html>
+        </tbody>
+    </table>
+    <div class="form-group">
+        <label for="additional_columns" class="form-label">Add Additional Columns:</label>
+        <select name="additional_columns" id="additional_columns" class="form-select" multiple>
+            {% for dataset_col in dataset_columns %}
+            <option value="{{ dataset_col }}">{{ dataset_col }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary w-100">Next</button>
+</form>
+{% endblock %}

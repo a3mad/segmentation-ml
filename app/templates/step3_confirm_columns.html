@@ -1,38 +1,44 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8"/>
-    <title>Step 3 Confirmation</title>
-</head>
-<body>
-    <h1>Step 3: Confirm Matched Columns</h1>
-    <p>The following column mapping will be used for segmentation:</p>
-    <table>
+{% extends "base.html" %}
+{% block title %}Step 3 Confirmation{% endblock %}
+{% block content %}
+<h1 class="text-center mb-4">Step 3: Confirm Matched Columns</h1>
+
+<p class="text-muted">The following column mapping will be used for segmentation:</p>
+
+<table class="table table-bordered table-striped">
+    <thead>
         <tr>
             <th>Required Column</th>
             <th>Dataset Column</th>
         </tr>
+    </thead>
+    <tbody>
         {% for req_col, dataset_col in column_mapping.items() %}
         <tr>
             <td>{{ req_col }}</td>
             <td>{{ dataset_col if dataset_col else "None" }}</td>
         </tr>
         {% endfor %}
-    </table>
+    </tbody>
+</table>
 
-    <h3>Additional Columns</h3>
-    <ul>
-        {% for col in additional_columns %}
-        <li>{{ col }}</li>
-        {% endfor %}
-    </ul>
+<h3 class="mt-4">Additional Columns</h3>
+<ul class="list-group mb-4">
+    {% for col in additional_columns %}
+    <li class="list-group-item">{{ col }}</li>
+    {% endfor %}
+</ul>
 
-    <p>Segmentation might take some time. Are you sure you want to proceed?</p>
+<div class="alert alert-warning" role="alert">
+    <p class="mb-0">Segmentation might take some time. Are you sure you want to proceed?</p>
+</div>
+
+<div class="d-flex justify-content-between mt-4">
     <form method="POST">
-        <button type="submit">Confirm and Proceed</button>
+        <button type="submit" class="btn btn-primary">Confirm and Proceed</button>
     </form>
     <form method="GET" action="{{ url_for('main.step3_match_columns') }}">
-        <button type="submit">Go Back</button>
+        <button type="submit" class="btn btn-secondary">Go Back</button>
     </form>
-</body>
-</html>
+</div>
+{% endblock %}

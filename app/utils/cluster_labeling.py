@@ -47,7 +47,7 @@ def generate_cluster_labels(cluster_data, cluster_labels, metadata):
         for col in additional_columns:
             if col in cluster_subset:
                 common_value = cluster_subset[col].mode()[0]
-                label_parts.append(str(common_value))
+                label_parts.append(f"{col} around: "+str(common_value))
 
         # Combine parts into a single label
         cluster_descriptions[cluster_id] = ", ".join(label_parts)

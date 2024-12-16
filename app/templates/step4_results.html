@@ -1,41 +1,37 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8"/>
-    <title>Segmentation Results</title>
-</head>
-<body>
-    <h1>Step 4: Results</h1>
-    <p>Segmentation Type: {{ chosen_type }}</p>
-    <p>Number of Clusters: {{ cluster_info.n_clusters }}</p>
-    <p>Silhouette Score: {{ cluster_info.silhouette_score }}</p>
+{% extends "base.html" %}
+{% block title %}Segmentation Results{% endblock %}
+{% block content %}
+<h1 class="text-center">Segmentation Results</h1>
+<p><strong>Segmentation Type:</strong> {{ chosen_type }}</p>
+<p><strong>Number of Clusters:</strong> {{ cluster_info.n_clusters }}</p>
+<p><strong>Silhouette Score:</strong> {{ cluster_info.silhouette_score }}</p>
 
-    <h2>Cluster Descriptions</h2>
-    <table border="1">
-        <thead>
-            <tr>
-                <th>Cluster ID</th>
-                <th>Cluster Label</th>
-                <th>Number of Customers</th>
-            </tr>
-        </thead>
-        <tbody>
+<h2>Cluster Descriptions</h2>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Cluster ID</th>
+            <th>Cluster Label</th>
+            <th>Number of Customers</th>
+        </tr>
+    </thead>
+    <tbody>
         {% for cluster in cluster_info.clusters %}
-            <tr>
-                <td>{{ cluster.id }}</td>
-                <td>{{ cluster.label }}</td>
-                <td>{{ cluster.num_customers }}</td>
-            </tr>
+        <tr>
+            <td>{{ cluster.id }}</td>
+            <td>{{ cluster.label }}</td>
+            <td>{{ cluster.num_customers }}</td>
+        </tr>
         {% endfor %}
-        </tbody>
-    </table>
+    </tbody>
+</table>
 
-    <h2>Generated Graphs</h2>
+<h2>Graphs</h2>
+<div class="row">
     {% for graph in graph_files %}
-        <div>
-            <h3>{{ graph.split('_')[0].replace('-', ' ').capitalize() }}</h3>
-            <img src="{{ url_for('static', filename='images/' + graph) }}" alt="{{ graph.split('_')[0].capitalize() }}">
-        </div>
+    <div class="col-md-6">
+        <img src="{{ url_for('static', filename='images/' + graph) }}" class="img-fluid" alt="{{ graph }}">
+    </div>
     {% endfor %}
-</body>
-</html>
+</div>
+{% endblock %}

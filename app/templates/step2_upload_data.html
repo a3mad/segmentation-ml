@@ -1,36 +1,20 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8"/>
-    <title>Upload Data</title>
-</head>
-<body>
-    <h1>Step 2: Upload Your Dataset</h1>
-
-    <p>Below are the required columns for the chosen segmentation type. Please review them before uploading your dataset:</p>
-    <table border="1">
-        <thead>
-            <tr>
-                <th>Required Column</th>
-                <th>Type</th>
-                <th>Range/Example</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for column_name, details in required_columns_info.items() %}
-            <tr>
-                <td>{{ column_name }}</td>
-                <td>{{ details['type'] }}</td>
-                <td>{{ details['example'] }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-
-    <form method="POST" enctype="multipart/form-data">
-        <label for="data_file">Select CSV file:</label>
-        <input type="file" name="data_file" id="data_file" accept=".csv" required>
-        <button type="submit">Next</button>
-    </form>
-</body>
-</html>
+{% extends "base.html" %}
+{% block title %}Upload Dataset{% endblock %}
+{% block content %}
+<h1 class="text-center">Step 2: Upload Your Dataset</h1>
+<form method="POST" enctype="multipart/form-data" class="mx-auto" style="max-width: 400px;">
+    <div class="form-group mb-3">
+        <label for="data_file" class="form-label">Select CSV File:</label>
+        <input type="file" name="data_file" id="data_file" class="form-control" accept=".csv" required>
+    </div>
+    <h4>Required Columns:</h4>
+    <ul class="list-group mb-3">
+        {% for col, meta in required_columns_info.items() %}
+        <li class="list-group-item">
+            <strong>{{ col }}</strong> ({{ meta.type }}, Example: {{ meta.example }})
+        </li>
+        {% endfor %}
+    </ul>
+    <button type="submit" class="btn btn-primary w-100">Next</button>
+</form>
+{% endblock %}

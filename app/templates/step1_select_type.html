@@ -1,30 +1,16 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8"/>
-    <title>Select Segmentation Type</title>
-</head>
-<body>
-    <h1>Step 1: Choose Segmentation Type</h1>
-    {% if not step_completed %}
-    <form method="POST">
-        <label for="segmentation_type">Choose a segmentation type:</label>
-        <select name="segmentation_type" id="segmentation_type">
-            {% for seg_type in segmentation_types %}
-                <option value="{{ seg_type }}">{{ seg_type }}</option>
+{% extends "base.html" %}
+{% block title %}Select Segmentation Type{% endblock %}
+{% block content %}
+<h1 class="text-center">Step 1: Select Segmentation Type</h1>
+<form method="POST" class="mx-auto" style="max-width: 400px;">
+    <div class="form-group mb-3">
+        <label for="segmentation_type" class="form-label">Choose Segmentation Type:</label>
+        <select name="segmentation_type" id="segmentation_type" class="form-select">
+            {% for type in segmentation_types %}
+            <option value="{{ type }}">{{ type }}</option>
             {% endfor %}
         </select>
-        <button type="submit">Next</button>
-    </form>
-    {% else %}
-        <h2>Chosen Type: {{ chosen_type }}</h2>
-        <p>Required Columns:</p>
-        <ul>
-        {% for col in required_cols %}
-            <li>{{ col }}</li>
-        {% endfor %}
-        </ul>
-        <a href="{{ url_for('main.step2_upload_data') }}">Next</a>
-    {% endif %}
-</body>
-</html>
+    </div>
+    <button type="submit" class="btn btn-primary w-100">Next</button>
+</form>
+{% endblock %}
