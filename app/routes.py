@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, request, session, redirect, url_for, current_app
 from .utils.data_preprocessing import load_and_prepare_data, REQUIRED_COLUMNS_MAP
 from .utils.clustering import perform_clustering
+from .utils.cluster_labeling import generate_cluster_labels
 from .utils.insights import generate_insights
 import pandas as pd
 import os
@@ -130,8 +131,8 @@ def step4_results():
         if current_app.config.get('DEBUG_MODE', False):
             df = df.head(100)
 
-        # Pass session explicitly to the function
-        df_scaled, df_original = load_and_prepare_data(chosen_type, df, column_mapping, session)
+        # Prepare the data
+        df_scaled, df_original, encoders = load_and_prepare_data(chosen_type, df, column_mapping, session)
 
     except ValueError as e:
         return f"Error during data preparation: {str(e)}"
@@ -142,15 +143,43 @@ def step4_results():
         # Perform clustering
         cluster_labels, cluster_info = perform_clustering(df_scaled)
 
-        # Generate insights
-        insights = generate_insights(df_original, cluster_labels)
+        # Generate meaningful cluster labels
+        cluster_descriptions = generate_cluster_labels(
+            cluster_data=df_original,
+            cluster_labels=cluster_labels,
+            metadata={
+                "encoders": encoders,
+                "additional_columns": session.get('additional_columns', []),
+                "required_columns": REQUIRED_COLUMNS_MAP[chosen_type]['columns']
+            }
+        )
+
+        # Add cluster labels to the data
+        df_original['Cluster'] = cluster_labels
+        df_original['Cluster Label'] = df_original['Cluster'].map(cluster_descriptions)
+
+        # Prepare cluster info for the template
+        cluster_counts = df_original.groupby('Cluster').size().to_dict()
+        cluster_info = {
+            "n_clusters": cluster_info['n_clusters'],
+            "silhouette_score": cluster_info['silhouette_score'],
+            "clusters": [
+                {
+                    "id": cluster_id,
+                    "label": cluster_descriptions[cluster_id],
+                    "count": cluster_counts.get(cluster_id, 0)
+                }
+                for cluster_id in sorted(cluster_descriptions.keys())
+            ],
+            "columns_used": list(column_mapping.values()) + session.get('additional_columns', [])
+        }
 
     except Exception as e:
-        return f"Error during clustering or insights generation: {str(e)}"
+        return f"Error during clustering or cluster description generation: {str(e)}"
 
     return render_template(
         'step4_results.html',
         chosen_type=chosen_type,
-        cluster_info=cluster_info,
-        insights=insights
+        cluster_info=cluster_info
     )
+

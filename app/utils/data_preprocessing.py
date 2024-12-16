@@ -55,7 +55,6 @@ REQUIRED_COLUMNS_MAP = {
 }
 
 def load_and_prepare_data(segmentation_type, df, column_mapping, session):
-
     required_cols = list(REQUIRED_COLUMNS_MAP[segmentation_type]['columns'].keys())
     mapped_columns = {req: column_mapping.get(req) for req in required_cols}
 
@@ -66,11 +65,15 @@ def load_and_prepare_data(segmentation_type, df, column_mapping, session):
     # Select and preprocess the dataset
     df_selected = df[all_columns].copy()
 
+    # Store encoders for categorical columns
+    encoders = {}
+
     # Handle string/categorical columns
     for col in df_selected.columns:
         if df_selected[col].dtype == 'object':
             le = LabelEncoder()
             df_selected[col] = le.fit_transform(df_selected[col].astype(str))
+            encoders[col] = le
 
     # Scale numerical columns
     scaler = StandardScaler()
@@ -78,10 +81,6 @@ def load_and_prepare_data(segmentation_type, df, column_mapping, session):
 
     # Reset index for alignment
     df_selected = df_selected.reset_index(drop=True)
-    return scaled_data, df_selected
-
-
-
-
+    return scaled_data, df_selected, encoders
 
 
